@@ -2,6 +2,113 @@
   <img width="1280" alt="cover" src="https://user-images.githubusercontent.com/2206700/189457799-6327bab0-b085-4421-8640-6a18e395d17d.png">
 </p>
 
+# AGMaker Integration for Dialogic 2
+
+**🎮 Perfect for Action Game Maker (AGMaker) Users!**
+
+This is a modified version of Dialogic 2 that includes seamless integration with Action Game Maker, making it easy for non-programmers to add professional dialogue systems to their games without coding.
+
+## What is AGMaker Integration?
+
+The AGMaker integration allows you to trigger Dialogic conversations directly from your Action Game Maker visual scripts using simple signal emissions. No complex coding required!
+
+## Quick Start for AGMaker Users
+
+### 📦 Installation
+
+1. **Download the Plugin**
+   - Add the `dialogic` folder to your project's `addons` folder
+   - If you don't have an `addons` folder, create one in your project root
+   
+2. **Enable the Plugin**
+   - Go to **Project Settings** → **Plugins**
+   - Find "Dialogic" and enable it
+   - **Important:** Reload your editor after enabling
+
+3. **Setup Complete!** ✅
+
+### 🔧 Basic Usage
+
+#### Step 1: Create Your Dialogue Timeline
+First, you'll need to create your dialogue content using Dialogic's timeline editor:
+- Open the Dialogic dock in Godot
+- Create a new timeline and give it a memorable name (e.g., "ShopKeeper_Greeting")
+- Add your dialogue, characters, and choices
+- For detailed timeline creation, see the [Official Dialogic Documentation](https://docs.dialogic.pro/)
+
+#### Step 2: Add the AGMaker Link Node
+1. In your scene, add a new node → **AGMakerDialogicLink**
+2. Configure the node properties:
+   - **Game Object is Owner**: Usually keep this checked (uses the object with your visual script)
+   - **Timeline Name**: Enter the exact name of your Dialogic timeline
+
+![AGMaker Link Node Setup](placeholder-image-agmaker-link-setup.png)
+*Add image showing the AGMakerDialogicLink node properties panel*
+
+#### Step 3: Connect from Your Visual Script
+1. In your AGMaker visual script, add an **Emit Signal** action
+2. Use the **exact same name** as your timeline name for the signal
+3. Connect this to whatever triggers your dialogue (button press, collision, etc.)
+
+![Visual Script Signal Setup](placeholder-image-visual-script-signal.png)
+*Add image showing AGMaker visual script with emit signal action*
+
+#### Step 4: Handle Dialogue Completion (Optional)
+If you want your game to wait until the dialogue finishes:
+1. Add a **Signal Detected** condition after your dialogue trigger
+2. Use `timeline_ended` as the signal name
+3. This prevents the state from continuing until the player finishes reading
+
+![Timeline Ended Signal](placeholder-image-timeline-ended-signal.png)
+*Add image showing the timeline_ended signal detection in visual script*
+
+### 🎯 Complete Example Workflow
+
+Let's say you want an NPC to greet the player when they approach:
+
+1. **Create Timeline**: Make a timeline called "NPC_Greeting" with your dialogue
+2. **Add Link Node**: Add AGMakerDialogicLink to your NPC scene, set timeline name to "NPC_Greeting"
+3. **Visual Script**: In your NPC's visual script:
+   - **Trigger**: Player enters area
+   - **Action**: Emit Signal "NPC_Greeting"
+   - **Wait**: Signal Detected "timeline_ended" (optional)
+   - **Continue**: Rest of your logic
+
+### 🔄 Multiple Dialogues Per Object
+
+You can have multiple conversations on the same object:
+- Add multiple AGMakerDialogicLink nodes
+- Give each a different timeline name
+- Emit different signals for different conversations
+
+### 📝 Important Notes
+
+- **Signal Names Must Match**: The signal you emit must exactly match your timeline name
+- **One Node Per Timeline**: Each AGMakerDialogicLink handles one timeline
+- **Case Sensitive**: Timeline names are case-sensitive
+- **No Spaces**: Avoid spaces in timeline names (use underscores instead)
+
+### 🆘 Troubleshooting
+
+**Dialogue Not Starting?**
+- Check signal name matches timeline name exactly
+- Ensure AGMakerDialogicLink node is in the scene
+- Verify timeline exists in Dialogic
+
+**Game Not Waiting for Dialogue?**
+- Make sure you're using "timeline_ended" signal detection
+- Check the signal is spelled correctly (no capital letters)
+
+### 📚 Next Steps
+
+Once you've got basic dialogues working:
+- Explore character portraits and animations in Dialogic
+- Try branching conversations with choices
+- Add variables to track player decisions
+- Check out the full Dialogic documentation below for advanced features
+
+---
+
 <h1 align="center">Dialogic 2</h1>
 
 <p align="center">
