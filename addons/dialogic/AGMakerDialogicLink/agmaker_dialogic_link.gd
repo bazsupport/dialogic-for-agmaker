@@ -65,7 +65,8 @@ func _get_property_list() -> Array:
 		properties.append({
 			"name": "game_object",
 			"type": TYPE_OBJECT,
-			"class_name": "GameObject"
+			"hint": PROPERTY_HINT_NODE_TYPE,
+			"hint_string": "GameObject"
 		})
 	
 	# Always show timeline_name
