@@ -2,13 +2,11 @@
   <img width="1280" alt="cover" src="https://user-images.githubusercontent.com/2206700/189457799-6327bab0-b085-4421-8640-6a18e395d17d.png">
 </p>
 
-# AGMaker Integration for Dialogic 2
-
-**🎮 Perfect for Action Game Maker (AGMaker) Users!**
+# Dialogic 2 For AGMaker
 
 This is a modified version of Dialogic 2 that includes seamless integration with Action Game Maker, making it easy for non-programmers to add professional dialogue systems to their games without coding.
 
-## What is AGMaker Integration?
+## What kind of AGMaker Integration?
 
 The AGMaker integration allows you to trigger Dialogic conversations directly from your Action Game Maker visual scripts using simple signal emissions. No complex coding required!
 
@@ -36,50 +34,37 @@ First, you'll need to create your dialogue content using Dialogic's timeline edi
 - Add your dialogue, characters, and choices
 - For detailed timeline creation, see the [Official Dialogic Documentation](https://docs.dialogic.pro/)
 
-#### Step 2: Add the AGMaker Link Node
+#### Step 2: Add the AGMakerDialogicLink Node
 1. In your scene, add a new node → **AGMakerDialogicLink**
 2. Configure the node properties:
    - **Game Object is Owner**: Usually keep this checked (uses the object with your visual script)
-   - **Timeline Name**: Enter the exact name of your Dialogic timeline
+   - **Timeline Name**: Enter the exact name of your Dialogic timeline. Additionally, you can choose to rename the node and use that as the timeline name
 
 ![AGMaker Link Node Setup](placeholder-image-agmaker-link-setup.png)
 *Add image showing the AGMakerDialogicLink node properties panel*
 
-#### Step 3: Connect from Your Visual Script
-1. In your AGMaker visual script, add an **Emit Signal** action
+#### Step 3: Connect from a Visual Script
+1. In your AGMaker visual script, add an **EmitSignal** action
 2. Use the **exact same name** as your timeline name for the signal
-3. Connect this to whatever triggers your dialogue (button press, collision, etc.)
 
 ![Visual Script Signal Setup](placeholder-image-visual-script-signal.png)
 *Add image showing AGMaker visual script with emit signal action*
 
 #### Step 4: Handle Dialogue Completion (Optional)
 If you want your game to wait until the dialogue finishes:
-1. Add a **Signal Detected** condition after your dialogue trigger
+1. Add a **SignalDetected** condition in the link leaving your dialogue trigger state
 2. Use `timeline_ended` as the signal name
 3. This prevents the state from continuing until the player finishes reading
 
 ![Timeline Ended Signal](placeholder-image-timeline-ended-signal.png)
 *Add image showing the timeline_ended signal detection in visual script*
 
-### 🎯 Complete Example Workflow
-
-Let's say you want an NPC to greet the player when they approach:
-
-1. **Create Timeline**: Make a timeline called "NPC_Greeting" with your dialogue
-2. **Add Link Node**: Add AGMakerDialogicLink to your NPC scene, set timeline name to "NPC_Greeting"
-3. **Visual Script**: In your NPC's visual script:
-   - **Trigger**: Player enters area
-   - **Action**: Emit Signal "NPC_Greeting"
-   - **Wait**: Signal Detected "timeline_ended" (optional)
-   - **Continue**: Rest of your logic
-
 ### 🔄 Multiple Dialogues Per Object
 
 You can have multiple conversations on the same object:
 - Add multiple AGMakerDialogicLink nodes
 - Give each a different timeline name
-- Emit different signals for different conversations
+- EmitSignal different signals for different conversations
 
 ### 📝 Important Notes
 
@@ -98,6 +83,7 @@ You can have multiple conversations on the same object:
 **Game Not Waiting for Dialogue?**
 - Make sure you're using "timeline_ended" signal detection
 - Check the signal is spelled correctly (no capital letters)
+- Consider saving a SignalDetected resource with the timeline_ended already typed in for ease of use
 
 ### 📚 Next Steps
 
