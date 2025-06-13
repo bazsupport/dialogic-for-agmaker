@@ -40,8 +40,7 @@ First, you'll need to create your dialogue content using Dialogic's timeline edi
    - **Game Object is Owner**: Usually keep this checked (uses the object with your visual script)
    - **Timeline Name**: Enter the exact name of your Dialogic timeline. Additionally, you can choose to rename the node and use that as the timeline name
 
-![AGMaker Link Node Setup](placeholder-image-agmaker-link-setup.png)
-*Add image showing the AGMakerDialogicLink node properties panel*
+![Image](https://github.com/user-attachments/assets/4c746816-328d-45ee-9dab-6aaeaddfd119)
 
 #### Step 3: Connect from a Visual Script
 1. In your AGMaker visual script, add an **EmitSignal** action
