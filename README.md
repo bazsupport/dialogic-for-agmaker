@@ -46,8 +46,7 @@ First, you'll need to create your dialogue content using Dialogic's timeline edi
 1. In your AGMaker visual script, add an **EmitSignal** action
 2. Use the **exact same name** as your timeline name for the signal
 
-![Visual Script Signal Setup](placeholder-image-visual-script-signal.png)
-*Add image showing AGMaker visual script with emit signal action*
+![Image](https://github.com/user-attachments/assets/0938e6d9-64d4-4789-808b-18968f6ed7f0)
 
 #### Step 4: Handle Dialogue Completion (Optional)
 If you want your game to wait until the dialogue finishes:
@@ -55,8 +54,7 @@ If you want your game to wait until the dialogue finishes:
 2. Use `timeline_ended` as the signal name
 3. This prevents the state from continuing until the player finishes reading
 
-![Timeline Ended Signal](placeholder-image-timeline-ended-signal.png)
-*Add image showing the timeline_ended signal detection in visual script*
+![Image](https://github.com/user-attachments/assets/a7a0dc0e-2ebb-4777-8717-8e1912feca90)
 
 ### 🔄 Multiple Dialogues Per Object
 
@@ -83,6 +81,8 @@ You can have multiple conversations on the same object:
 - Make sure you're using "timeline_ended" signal detection
 - Check the signal is spelled correctly (no capital letters)
 - Consider saving a SignalDetected resource with the timeline_ended already typed in for ease of use
+
+![Image](https://github.com/user-attachments/assets/88c9ff3f-fa1b-419a-9ac1-2428e61ab623)
 
 ### 📚 Next Steps
 
