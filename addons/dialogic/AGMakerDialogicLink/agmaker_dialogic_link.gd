@@ -5,12 +5,18 @@ class_name AGMakerDialogicLink
 
 var game_object_is_owner:bool = true : set = _set_game_object_is_owner
 var game_object:GameObject : set = _set_game_object
+var timeline_is_node_name:bool = false : set = _set_timeline_is_node_name
 var timeline_name:String = ""
 
 signal timeline_ended
 
 func _ready() -> void:
 	var target_object = null
+	var actual_timeline = timeline_name
+	
+	# Use node name as timeline if timeline_is_node_name is true
+	if timeline_is_node_name:
+		actual_timeline = name
 	
 	# Determine which object to use based on obj_is_owner flag
 	if game_object_is_owner:
@@ -23,8 +29,8 @@ func _ready() -> void:
 		return
 	
 	# Connect signals if the target object has the required signal
-	if target_object.has_signal(timeline_name):
-		target_object.connect(timeline_name, Callable(self, "_on_start_dialogue"))
+	if target_object.has_signal(actual_timeline):
+		target_object.connect(actual_timeline, Callable(self, "_on_start_dialogue"))
 		timeline_ended.connect(Callable(target_object, "receive_signal"))
 
 func _on_start_dialogue(timeline_name:String,_value) -> void:
@@ -43,6 +49,11 @@ func _set_game_object_is_owner(value: bool) -> void:
 # Setter for game_object to ensure visibility is updated when game_object changes
 func _set_game_object(value: GameObject) -> void:
 	game_object = value
+	_update_obj_visibility()
+
+# Setter for timeline_is_node_name that controls timeline_name visibility
+func _set_timeline_is_node_name(value: bool) -> void:
+	timeline_is_node_name = value
 	_update_obj_visibility()
 
 # Updates the visibility of the game_object property in the inspector
@@ -69,10 +80,17 @@ func _get_property_list() -> Array:
 			"hint_string": "GameObject"
 		})
 	
-	# Always show timeline_name
+	# Always show timeline_is_node_name
 	properties.append({
-		"name": "timeline_name",
-		"type": TYPE_STRING
+		"name": "timeline_is_node_name",
+		"type": TYPE_BOOL
 	})
+	
+	# Only show timeline_name if timeline_is_node_name is false
+	if not timeline_is_node_name:
+		properties.append({
+			"name": "timeline_name",
+			"type": TYPE_STRING
+		})
 	
 	return properties
