@@ -161,7 +161,7 @@ func open() -> void:
 	DialogicResourceUtil.update_directory('dch')
 	DialogicResourceUtil.update_directory('dtl')
 	popup_centered_ratio(0.5)
-	move_to_foreground()
+	#move_to_foreground()
 	grab_focus()
 
 
