@@ -34,8 +34,8 @@ First, you'll need to create your dialogue content using Dialogic's timeline edi
 - Add your dialogue, characters, and choices
 - For detailed timeline creation, see the [Official Dialogic Documentation](https://docs.dialogic.pro/)
 
-#### Step 2: Add the AGMakerDialogicLink Node
-1. In your scene, add a new node → **AGMakerDialogicLink**
+#### Step 2: Add the BazDialogicLink Node
+1. In your scene, add a new node → **BazDialogicLink**
 2. Configure the node properties:
    - **Game Object is Owner**: Usually keep this checked (uses the object with your visual script)
    - **Timeline Name**: Enter the exact name of your Dialogic timeline. Additionally, you can choose to rename the node and use that as the timeline name
@@ -56,25 +56,41 @@ If you want your game to wait until the dialogue finishes:
 
 ![Image](https://github.com/user-attachments/assets/a7a0dc0e-2ebb-4777-8717-8e1912feca90)
 
+#### Step 5: Handle Player Choices (Optional)
+When your dialogue includes choices, you can respond to player selections:
+1. Add a **SignalDetected** condition after your dialogue trigger
+2. Use `timeline_choice` as the signal name
+3. The signal will include the choice number (starting from 0) as a parameter
+4. Use **GetSignalParameter** to retrieve the choice number
+5. Create branching logic based on the choice value
+
+**Example Choice Handling:**
+- Choice 0: "Yes" → Continue to acceptance dialogue
+- Choice 1: "No" → Continue to rejection dialogue
+- Choice 2: "Maybe later" → End conversation
+
+![Image](https://github.com/user-attachments/assets/a7a0dc0e-2ebb-4777-8717-8e1912feca90)
+
 ### 🔄 Multiple Dialogues Per Object
 
 You can have multiple conversations on the same object:
-- Add multiple AGMakerDialogicLink nodes
+- Add multiple BazDialogicLink nodes
 - Give each a different timeline name
 - EmitSignal different signals for different conversations
 
 ### 📝 Important Notes
 
 - **Signal Names Must Match**: The signal you emit must exactly match your timeline name
-- **One Node Per Timeline**: Each AGMakerDialogicLink handles one timeline
+- **One Node Per Timeline**: Each BazDialogicLink handles one timeline
 - **Case Sensitive**: Timeline names are case-sensitive
 - **No Spaces**: Avoid spaces in timeline names (use underscores instead)
+- **Choice Numbers**: Choices are numbered starting from 0 (first choice = 0, second choice = 1, etc.)
 
 ### 🆘 Troubleshooting
 
 **Dialogue Not Starting?**
 - Check signal name matches timeline name exactly
-- Ensure AGMakerDialogicLink node is in the scene
+- Ensure BazDialogicLink node is in the scene
 - Verify timeline exists in Dialogic
 
 **Game Not Waiting for Dialogue?**
@@ -82,14 +98,20 @@ You can have multiple conversations on the same object:
 - Check the signal is spelled correctly (no capital letters)
 - Consider saving a SignalDetected resource with the timeline_ended already typed in for ease of use
 
+**Choices Not Working?**
+- Ensure your timeline has choice events in Dialogic
+- Use "timeline_choice" signal detection after dialogue starts
+- Check that GetSignalParameter is correctly retrieving the choice number
+- Remember choice numbers start from 0, not 1
+
 ![Image](https://github.com/user-attachments/assets/88c9ff3f-fa1b-419a-9ac1-2428e61ab623)
 
 ### 📚 Next Steps
 
 Once you've got basic dialogues working:
 - Explore character portraits and animations in Dialogic
-- Try branching conversations with choices
-- Add variables to track player decisions
+- Try branching conversations with choices and use the choice handling system
+- Add variables to track player decisions across multiple conversations
 - Check out the full Dialogic documentation below for advanced features
 
 ---
