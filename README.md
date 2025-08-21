@@ -60,18 +60,11 @@ If you want your game to wait until the dialogue finishes:
 
 #### Step 5: Handle Player Choices (Optional)
 When your dialogue includes choices, you can respond to player selections:
-1. Add a **SignalDetected** condition after your dialogue trigger
+1. Add a **SignalDetected** condition
 2. Use `timeline_choice` as the signal name
-3. The signal will include the choice number (starting from 0) as a parameter
-4. Use **GetSignalParameter** to retrieve the choice number
-5. Create branching logic based on the choice value
-
-**Example Choice Handling:**
-- Choice 0: "Yes" → Continue to acceptance dialogue
-- Choice 1: "No" → Continue to rejection dialogue
-- Choice 2: "Maybe later" → End conversation
-
-![Image](https://github.com/user-attachments/assets/a7a0dc0e-2ebb-4777-8717-8e1912feca90)
+3. Use Numeric option under Argument Type
+4. Use = operator and set Constant Value to 0, 1, 2, etc. for each choice
+5. Setup the rest of the reaction from the visual script itself
 
 ### 🔄 Multiple Dialogues Per Object
 
