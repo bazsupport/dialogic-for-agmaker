@@ -2,7 +2,7 @@
   <img width="1280" alt="cover" src="https://user-images.githubusercontent.com/2206700/189457799-6327bab0-b085-4421-8640-6a18e395d17d.png">
 </p>
 
-# Dialogic 2 For AGMaker
+# Dialogic For AGMaker
 
 This is a modified version of Dialogic 2 that includes seamless integration with Action Game Maker, making it easy for non-programmers to add professional dialogue systems to their games without coding.
 
