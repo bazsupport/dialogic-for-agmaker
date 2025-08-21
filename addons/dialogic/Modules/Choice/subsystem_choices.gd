@@ -21,7 +21,8 @@ var block_delay := 0.2
 var autofocus_first_choice := true
 ## If true the dialogic input action is used to trigger choices.
 ## However mouse events will be ignored no matter what.
-var use_input_action := false
+## BazEdit: Mouse events seemed to work still, not sure why the above comment exists
+var use_input_action := true
 
 enum FalseBehaviour {HIDE=0, DISABLE=1}
 ## The behaviour of choices with a false condition and else_action set to DEFAULT.

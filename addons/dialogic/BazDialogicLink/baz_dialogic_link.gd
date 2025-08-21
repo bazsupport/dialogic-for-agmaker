@@ -1,14 +1,15 @@
 @tool
-@icon("res://addons/dialogic/AGMakerDialogicLink/icon.png")
+@icon("res://addons/dialogic/BazDialogicLink/icon.png")
 extends Node
-class_name AGMakerDialogicLink
+class_name BazDialogicLink
 
 var game_object_is_owner:bool = true : set = _set_game_object_is_owner
 var game_object:GameObject : set = _set_game_object
-var timeline_is_node_name:bool = false : set = _set_timeline_is_node_name
+var timeline_is_node_name:bool = true : set = _set_timeline_is_node_name
 var timeline_name:String = ""
 
 signal timeline_ended
+signal timeline_choice
 
 func _ready() -> void:
 	var target_object = null
@@ -32,14 +33,21 @@ func _ready() -> void:
 	if target_object.has_signal(actual_timeline):
 		target_object.connect(actual_timeline, Callable(self, "_on_start_dialogue"))
 		timeline_ended.connect(Callable(target_object, "receive_signal"))
+		timeline_choice.connect(Callable(target_object, "receive_signal"))
 
 func _on_start_dialogue(timeline_name:String,_value) -> void:
 	Dialogic.timeline_ended.connect(_on_timeline_ended)
+	Dialogic.signal_event.connect(_on_dialogic_signal_event)
 	Dialogic.start(timeline_name)
 
 func _on_timeline_ended():
 	Dialogic.timeline_ended.disconnect(_on_timeline_ended)
+	Dialogic.signal_event.disconnect(_on_dialogic_signal_event)
+	await get_tree().process_frame
 	timeline_ended.emit("timeline_ended",null)
+
+func _on_dialogic_signal_event(choice_number:String) -> void:
+	timeline_choice.emit("timeline_choice", int(choice_number))
 
 # Setter for game_object_is_owner that controls game_object visibility
 func _set_game_object_is_owner(value: bool) -> void:
@@ -92,5 +100,6 @@ func _get_property_list() -> Array:
 			"name": "timeline_name",
 			"type": TYPE_STRING
 		})
+	
 	
 	return properties
