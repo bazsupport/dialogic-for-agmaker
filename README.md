@@ -12,6 +12,8 @@ The AGMaker integration allows you to trigger Dialogic conversations directly fr
 
 ## Quick Start for AGMaker Users
 
+[Watch the Tutorial Video](https://youtu.be/bdDU0ork174)
+
 ### 📦 Installation
 
 1. **Download the Plugin**
