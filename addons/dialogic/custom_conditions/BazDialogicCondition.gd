@@ -34,8 +34,8 @@ class_name BazDialogicCondition
 ## AGMaker build doesn't list it there, copy this one file into the project-root
 ## `custom_conditions/` folder instead (AGMaker always scans that folder).
 ##
-## Section map: [mode] → [timeline picker] → [choice number] → [OS browse dialog] → [metadata]
-##              → [lifecycle] → [static latch + watcher].
+## Section map: [mode] → [timeline + choice fields] → [metadata] → [lifecycle]
+##              → [static latch + watcher].
 
 
 # --- 1. Mode ------------------------------------------------------------------
@@ -51,255 +51,53 @@ const CHECK_DIALOGUE_ACTIVE: int = 2
 		notify_property_list_changed()
 
 
-# --- 2. Timeline picker (pretty label shown, full path stored) ----------------
-# A String PROPERTY_HINT_ENUM stores label == value, so it can't show a friendly identifier
-# while storing a res:// path. So we surface a virtual int "timeline_picker" (the dropdown —
-# EDITOR-only, never saved) and keep the real value in "timeline_path" (STORAGE-only, hidden).
-# The picker's index is derived FRESH from timeline_path on every read, so re-scanning the
-# Dialogic directory in a different order can never corrupt the saved choice.
+# --- 2. Timeline + choice fields -----------------------------------------------
+# dialogic_timeline is a plain String field with a PROPERTY_HINT_ENUM_SUGGESTION hint (see
+# BazGenerateSceneAction's scene_choice / BazChangeNodePropertyAction's _apply_suggest for the
+# established pattern): it stores the typed identifier directly, and the inspector shows it as
+# a typeable dropdown that suggests every timeline from dialogic/directories/dtl_directory.
+# No virtual picker property, no _get/_set — inspector order comes straight from declaration
+# order, so this field sits between Dialogic Check and Choice Number for free.
 
-const _PICKER_INDEX_ANY: int = 0
-const _PICKER_INDEX_BROWSE: int = 1
+const ANY_TIMELINE: String = "Any"
 
-const _ANY_LABEL: String = "Any"
-const _BROWSE_LABEL: String = "Browse…"
-
-## The picked timeline's full res:// path ("" = Any). Hidden from the inspector (edited through
-## Timeline Picker below); surfaced/stored via _get_property_list.
-var timeline_path: String = ""
-
-
-func _get_property_list() -> Array[Dictionary]:
-	var props: Array[Dictionary] = []
-	if dialogic_check == CHECK_TIMELINE_ENDED or dialogic_check == CHECK_CHOICE_PICKED:
-		var lists: Dictionary = _build_picker_lists()
-		var labels: PackedStringArray = lists["labels"]
-		props.append({
-			"name": "timeline_picker",
-			"type": TYPE_INT,
-			"hint": PROPERTY_HINT_ENUM,
-			"hint_string": ",".join(labels),
-			"usage": PROPERTY_USAGE_EDITOR,
-		})
-	# Always emitted (STORAGE-only), even in Dialogue Active mode — a mode-hidden field whose
-	# storage property vanishes from the list gets its saved value dropped on next save.
-	props.append({
-		"name": "timeline_path",
-		"type": TYPE_STRING,
-		"usage": PROPERTY_USAGE_STORAGE,
-	})
-	return props
-
-
-func _get(property: StringName) -> Variant:
-	if property == &"timeline_picker":
-		return _current_picker_index()
-	return null
-
-
-func _set(property: StringName, value: Variant) -> bool:
-	if property == &"timeline_picker":
-		var index: int = int(value)
-		if index == _PICKER_INDEX_BROWSE:
-			# Command entry — never stored. Deferred so the suggestion popup finishes closing
-			# before a new window opens (BazGenerateSceneAction Browse pattern).
-			if Engine.is_editor_hint():
-				_open_browse_dialog.call_deferred()
-				notify_property_list_changed()   # redraw the field back to the stored value
-			return true
-		var values: PackedStringArray = _build_picker_lists()["values"]
-		if index >= 0 and index < values.size():
-			timeline_path = values[index]
-			notify_property_list_changed()
-		return true
-	return false
-
-
-func _property_can_revert(property: StringName) -> bool:
-	return property == &"timeline_picker" or property == &"timeline_path"
-
-
-func _property_get_revert(property: StringName) -> Variant:
-	if property == &"timeline_picker":
-		return _PICKER_INDEX_ANY
-	if property == &"timeline_path":
-		return ""
-	return null
-
-
-## Ordered { "values": paths (index-aligned), "labels": friendly labels } for the dropdown.
-## Index 0 is "Any" (empty path). Index 1 is the "Browse…" command (never stored — intercepted
-## in _set). Then every identifier from dialogic/directories/dtl_directory, sorted case-
-## insensitively. If the saved timeline_path isn't "" and isn't among those paths (deleted or
-## renamed), a "(missing) <basename>" entry keeps it visible so the choice is never silently
-## blanked.
-func _build_picker_lists() -> Dictionary:
-	var values: PackedStringArray = PackedStringArray()
-	var labels: PackedStringArray = PackedStringArray()
-	values.append("")
-	labels.append(_ANY_LABEL)
-	values.append("")
-	labels.append(_BROWSE_LABEL)
-	var directory: Dictionary = ProjectSettings.get_setting("dialogic/directories/dtl_directory", {})
-	var identifiers: Array[String] = []
-	for key in directory.keys():
-		identifiers.append(String(key))
-	identifiers.sort_custom(func(a: String, b: String) -> bool: return a.nocasecmp_to(b) < 0)
-	var found_current: bool = timeline_path == ""
-	for identifier in identifiers:
-		var path: String = String(directory[identifier])
-		values.append(path)
-		labels.append(identifier)
-		if path == timeline_path:
-			found_current = true
-	if not found_current:
-		values.append(timeline_path)
-		labels.append("(missing) " + timeline_path.get_file())
-	return {"values": values, "labels": labels}
-
-
-## The dropdown index for the currently-stored timeline_path (0 = Any). Recomputed each call —
-## never cached, so the saved choice survives a re-scan in a different order.
-func _current_picker_index() -> int:
-	if timeline_path == "":
-		return _PICKER_INDEX_ANY
-	var values: PackedStringArray = _build_picker_lists()["values"]
-	for i in range(2, values.size()):
-		if values[i] == timeline_path:
-			return i
-	return _PICKER_INDEX_ANY
-
-
-# --- 3. Choice number -----------------------------------------------------------
+## Which timeline this applies to.[br]Leave as Any for every timeline, or start typing a timeline's name to narrow the list.[br]Used by Timeline Ended and Choice Picked.
+@export var dialogic_timeline: String = ANY_TIMELINE
 
 ## Which choice button this fires for.[br]1 is the first button the player sees.[br]Only used when Dialogic Check is Choice Picked.
 @export_range(1, 99, 1) var choice_number: int = 1
 
 
 func _validate_property(property: Dictionary) -> void:
-	if property.name == "choice_number" and dialogic_check != CHECK_CHOICE_PICKED:
+	if property.name == "dialogic_timeline":
+		if dialogic_check == CHECK_DIALOGUE_ACTIVE:
+			property.usage = PROPERTY_USAGE_NO_EDITOR
+		else:
+			property.hint = PROPERTY_HINT_ENUM_SUGGESTION
+			property.hint_string = ",".join(_timeline_suggestions())
+	elif property.name == "choice_number" and dialogic_check != CHECK_CHOICE_PICKED:
 		property.usage = PROPERTY_USAGE_NO_EDITOR
 
 
-# --- 4. Native OS file-dialog picker (Browse) — EditorFileDialog fallback -----
-# Same shape as BazGenerateSceneAction's scene Browse: prefer the native OS dialog (outside
-# Godot's Window tree, so it can never collide with AGM's exclusive action-settings dialog);
-# fall back to an EditorFileDialog (which DOES need the exclusive-window release/restore dance)
-# on platforms without a native file dialog.
-
-const _BROWSE_FILTER: String = "*.dtl ; Dialogic Timeline"
-const _BROWSE_TITLE: String = "Pick a Dialogic Timeline"
-
-# Windows whose exclusive flag we released so the EditorFileDialog fallback could claim the
-# editor root. Editor-only, never serialized.
-var _released_exclusive_windows: Array[Window] = []
-
-# The fallback EditorFileDialog instance — kept only long enough to free it after use.
-var _fallback_dialog: EditorFileDialog = null
-
-
-func _open_browse_dialog() -> void:
-	if not Engine.is_editor_hint():
-		return
-	if DisplayServer.has_feature(DisplayServer.FEATURE_NATIVE_DIALOG_FILE):
-		var err: Error = DisplayServer.file_dialog_show(
-			_BROWSE_TITLE,
-			ProjectSettings.globalize_path("res://"),
-			"",
-			false,
-			DisplayServer.FILE_DIALOG_MODE_OPEN_FILE,
-			PackedStringArray([_BROWSE_FILTER]),
-			_on_native_dialog_result
-		)
-		if err != OK:
-			_open_fallback_dialog()
-	else:
-		_open_fallback_dialog()
+## Suggestion list for Dialogic Timeline: ANY_TIMELINE first, then every identifier from
+## dialogic/directories/dtl_directory, sorted case-insensitively. Keys containing a comma are
+## skipped — hint_string is comma-delimited and a comma in an entry would corrupt it. Never
+## empty (ANY_TIMELINE is always present).
+func _timeline_suggestions() -> PackedStringArray:
+	var names: PackedStringArray = PackedStringArray([ANY_TIMELINE])
+	var directory: Dictionary = ProjectSettings.get_setting("dialogic/directories/dtl_directory", {})
+	var identifiers: Array[String] = []
+	for key in directory.keys():
+		var identifier: String = String(key)
+		if not identifier.contains(","):
+			identifiers.append(identifier)
+	identifiers.sort_custom(func(a: String, b: String) -> bool: return a.nocasecmp_to(b) < 0)
+	for identifier in identifiers:
+		names.append(identifier)
+	return names
 
 
-## Native dialog callback — thread NOT documented-guaranteed to be main, so it does no real work
-## itself; it just bounces the payload to a deferred call.
-func _on_native_dialog_result(status: bool, selected_paths: PackedStringArray, _filter_idx: int) -> void:
-	_handle_picked_path.call_deferred(status, selected_paths)
-
-
-## EditorFileDialog fallback for platforms without a native file dialog. AGM's action-settings
-## dialog is an EXCLUSIVE child window of the editor root, and a window may hold only ONE
-## exclusive child — popping another exclusive Window on the same root logs a window.cpp:992
-## refusal. Release the claim while the picker is up; the handlers restore it.
-func _open_fallback_dialog() -> void:
-	_release_exclusive_windows()
-	_fallback_dialog = EditorFileDialog.new()
-	_fallback_dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
-	_fallback_dialog.access = EditorFileDialog.ACCESS_RESOURCES
-	_fallback_dialog.add_filter("*.dtl", "Dialogic Timeline")
-	_fallback_dialog.file_selected.connect(_on_fallback_file_selected)
-	_fallback_dialog.canceled.connect(_on_fallback_canceled)
-	EditorInterface.get_base_control().add_child(_fallback_dialog)
-	_fallback_dialog.popup_file_dialog()
-
-
-func _on_fallback_file_selected(path: String) -> void:
-	# Deferred: the dialog may still be closing when this fires — restoring exclusivity now
-	# would recreate the same window.cpp:992 conflict in reverse.
-	_restore_exclusive_windows.call_deferred()
-	_handle_picked_path.call_deferred(true, PackedStringArray([path]))
-	_free_fallback_dialog()
-
-
-func _on_fallback_canceled() -> void:
-	_restore_exclusive_windows.call_deferred()
-	_free_fallback_dialog()
-
-
-func _free_fallback_dialog() -> void:
-	if is_instance_valid(_fallback_dialog):
-		_fallback_dialog.queue_free()
-	_fallback_dialog = null
-
-
-func _release_exclusive_windows() -> void:
-	_released_exclusive_windows.clear()
-	var editor_root: Node = EditorInterface.get_base_control().get_tree().root
-	_collect_exclusive_windows(editor_root, _released_exclusive_windows)
-	for w in _released_exclusive_windows:
-		w.exclusive = false
-
-
-## Collects every VISIBLE exclusive Window below n (include_internal — editor dialogs are often
-## internal children). One walk per Browse click; not a hot path.
-static func _collect_exclusive_windows(n: Node, out: Array[Window]) -> void:
-	for child in n.get_children(true):
-		var w: Window = child as Window
-		if w != null and w.visible and w.exclusive:
-			out.append(w)
-		_collect_exclusive_windows(child, out)
-
-
-func _restore_exclusive_windows() -> void:
-	for w in _released_exclusive_windows:
-		if is_instance_valid(w) and w.visible:
-			w.exclusive = true
-	_released_exclusive_windows.clear()
-
-
-## Validates and stores a picked absolute OS path, or leaves timeline_path untouched on
-## cancel/invalid pick. Reached only via call_deferred (both the native callback and the
-## fallback signal handlers route through here) so it always runs on the main thread.
-func _handle_picked_path(status: bool, selected_paths: PackedStringArray) -> void:
-	if not Engine.is_editor_hint():
-		return
-	if not status or selected_paths.is_empty():
-		return   # cancelled — keep the old value
-	var localized: String = ProjectSettings.localize_path(selected_paths[0])
-	if not localized.begins_with("res://"):
-		push_warning("BazDialogicCondition: the picked file must be inside this project — ignored: %s" % localized)
-		return
-	timeline_path = localized
-	notify_property_list_changed()
-
-
-# --- 5. AGMaker plugin metadata -------------------------------------------------
+# --- 3. AGMaker plugin metadata -------------------------------------------------
 
 func get_plugin_tab_name() -> String:
 	return "CustomCondition"
@@ -313,7 +111,7 @@ func get_description() -> String:
 	return "True when a Dialogic timeline ended, a choice was picked, or a dialogue is running."
 
 
-# --- 6. AGMaker condition lifecycle ----------------------------------------------
+# --- 4. AGMaker condition lifecycle ----------------------------------------------
 # The trailing optional Variants are REQUIRED: AGMaker invokes these from C++ via a strict
 # Object::callp that passes MORE than just the owner. A single-parameter signature raises
 # CALL_ERROR_TOO_MANY_ARGUMENTS (error code 3) every frame. The extra params absorb the surplus.
@@ -327,6 +125,18 @@ func on_condition_enter(p_owner: Object, _p_extra_a: Variant = null, _p_extra_b:
 		return
 	_ensure_watcher(owner_node.get_tree())
 	_snapshots[owner_node.get_instance_id()] = {"ended": _ended_count, "choice": _choice_count}
+
+
+## True if dialogic_timeline is Any (or blank), or the given latched path matches the
+## directory entry for the picked identifier. A name not in the directory therefore never
+## matches — it never accidentally latches on a mistyped or renamed timeline.
+func _timeline_filter_matches(path: String) -> bool:
+	if dialogic_timeline == "" or dialogic_timeline == ANY_TIMELINE:
+		return true
+	var directory: Dictionary = ProjectSettings.get_setting("dialogic/directories/dtl_directory", {})
+	if not directory.has(dialogic_timeline):
+		return false
+	return path == String(directory[dialogic_timeline])
 
 
 ## Pure read — no side effects.
@@ -359,14 +169,14 @@ func on_judge_condition(p_owner: Object, _p_extra_a: Variant = null, _p_extra_b:
 	if dialogic_check == CHECK_TIMELINE_ENDED:
 		if _ended_count <= int(snap_dict.get("ended", 0)):
 			return false
-		return timeline_path == "" or _last_ended_path == timeline_path
+		return _timeline_filter_matches(_last_ended_path)
 
 	# CHECK_CHOICE_PICKED
 	if _choice_count <= int(snap_dict.get("choice", 0)):
 		return false
 	if _last_choice_index != choice_number:
 		return false
-	return timeline_path == "" or _last_choice_path == timeline_path
+	return _timeline_filter_matches(_last_choice_path)
 
 
 func on_condition_exit(p_owner: Object, _p_extra_a: Variant = null, _p_extra_b: Variant = null) -> void:
@@ -376,7 +186,7 @@ func on_condition_exit(p_owner: Object, _p_extra_a: Variant = null, _p_extra_b: 
 	_snapshots.erase(owner_node.get_instance_id())
 
 
-# --- 7. Static latch + self-spawned watcher --------------------------------------
+# --- 5. Static latch + self-spawned watcher --------------------------------------
 # The Dialogic autoload's timeline_started/timeline_ended/choice_selected signals each fire
 # once. A condition's on_judge_condition runs every frame and must be a pure read, so we can't
 # react to a one-shot signal directly. Instead a persistent watcher node (spawned under the

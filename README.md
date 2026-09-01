@@ -47,7 +47,7 @@ First, you'll need to create your dialogue content using Dialogic's timeline edi
 
 ### 🎬 Start a dialogue from the Add Dialog (v1.1.2)
 
-In your object's visual script, open the Add Dialog → **CustomAction** tab → **Dialogic** group → **BazDialogicAction**. Set **Dialogic Operation** to **Start Timeline**, then pick your timeline from the **Timeline Picker** dropdown (or choose **Browse…** to find the .dtl file with the Windows file dialog). **Start At Label** is optional — leave it blank to start from the top, or type a label name to jump straight there (handy for "second time we talk" branches driven by your AGMaker variables).
+In your object's visual script, open the Add Dialog → **CustomAction** tab → **Dialogic** group → **BazDialogicAction**. Set **Dialogic Operation** to **Start Timeline**, then set **Dialogic Timeline** — start typing the timeline's name and pick it from the list (the names are the ones you see in the Dialogic editor). **Start At Label** is optional — leave it blank to start from the top, or type a label name to jump straight there (handy for "second time we talk" branches driven by your AGMaker variables).
 
 Other operations: **End Timeline** (stop the dialogue, e.g. the player got hit), **Pause**, and **Resume**.
 
