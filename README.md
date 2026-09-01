@@ -6,6 +6,12 @@
 
 This is a modified version of Dialogic 2 that includes seamless integration with Action Game Maker, making it easy for non-programmers to add professional dialogue systems to their games without coding.
 
+## Compatibility
+
+- Works with AGMaker 1.4.0 (Godot 4.7) as of **v1.1.1**. Earlier AGMaker versions still work too.
+- If you already hand-patched `subsystem_variables.gd` by adding `return null` (the fix shared on Discord), this release is that same fix — just replace your `addons/dialogic` folder with this one.
+- Known issue: on AGMaker 1.4.0 some VN-style layouts put portraits at the left edge of the screen. This is being investigated for the next release — if it hits you, please report your layout setup.
+
 ## What kind of AGMaker Integration?
 
 The AGMaker integration allows you to trigger Dialogic conversations directly from your Action Game Maker visual scripts using simple signal emissions. No complex coding required!
