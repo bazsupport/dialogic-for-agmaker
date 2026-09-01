@@ -13,3 +13,7 @@ Re-apply these when upgrading the bundled Dialogic.
    history, commit 03f0f4d "added choices".
 5. `Editor/Common/reference_manager_window.gd` and `Editor/Common/update_install_window.gd`
    — modified between v1.0 and v1.1 (commits 320849b, f133f80). Exact hunks: see git history.
+6. `custom_actions/BazDialogicAction.gd` — added v1.1.2, AGMaker custom action (Start Timeline /
+   End Timeline / Pause / Resume). Carry the folder over on upgrade.
+7. `custom_conditions/BazDialogicCondition.gd` — added v1.1.2, AGMaker custom condition (Timeline
+   Ended / Choice Picked / Dialogue Active). Carry the folder over on upgrade.

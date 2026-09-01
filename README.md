@@ -10,11 +10,14 @@ This is a modified version of Dialogic 2 that includes seamless integration with
 
 - Works with AGMaker 1.4.0 (Godot 4.7) as of **v1.1.1**. Earlier AGMaker versions still work too.
 - If you already hand-patched `subsystem_variables.gd` by adding `return null` (the fix shared on Discord), this release is that same fix — just replace your `addons/dialogic` folder with this one.
-- Known issue: on AGMaker 1.4.0 some VN-style layouts put portraits at the left edge of the screen. This is being investigated for the next release — if it hits you, please report your layout setup.
+- Portraits landing at the left edge of the screen on AGMaker 1.4.0 turned out to be the same parse error, fixed in v1.1.1.
+- **v1.1.2** adds a Dialogic action and condition to AGMaker's Add Dialog — see *Start a dialogue from the Add Dialog* below.
 
 ## What kind of AGMaker Integration?
 
 The AGMaker integration allows you to trigger Dialogic conversations directly from your Action Game Maker visual scripts using simple signal emissions. No complex coding required!
+
+Everything under `addons/dialogic/` is Dialogic 2.0 Alpha 16 as released, except `BazDialogicLink/` (the legacy node plus `PATCHES.md`), `custom_actions/` and `custom_conditions/` (the AGMaker action and condition), and the small fixes listed in `addons/dialogic/BazDialogicLink/PATCHES.md`.
 
 ## Quick Start for AGMaker Users
 
@@ -42,7 +45,21 @@ First, you'll need to create your dialogue content using Dialogic's timeline edi
 - Add your dialogue, characters, and choices
 - For detailed timeline creation, see the [Official Dialogic Documentation](https://docs.dialogic.pro/)
 
-#### Step 2: Add the BazDialogicLink Node
+### 🎬 Start a dialogue from the Add Dialog (v1.1.2)
+
+In your object's visual script, open the Add Dialog → **CustomAction** tab → **Dialogic** group → **BazDialogicAction**. Set **Dialogic Operation** to **Start Timeline**, then pick your timeline from the **Timeline Picker** dropdown (or choose **Browse…** to find the .dtl file with the Windows file dialog). **Start At Label** is optional — leave it blank to start from the top, or type a label name to jump straight there (handy for "second time we talk" branches driven by your AGMaker variables).
+
+Other operations: **End Timeline** (stop the dialogue, e.g. the player got hit), **Pause**, and **Resume**.
+
+For link conditions, open the Add Dialog → **CustomCondition** tab → **Dialogic** group → **BazDialogicCondition**. **Dialogic Check** gives you **Timeline Ended** (optionally only for a specific timeline), **Choice Picked** (Choice Number 1 = the first button the player sees — no Signal events needed in the timeline anymore), and **Dialogue Active** (true while any dialogue is running, e.g. to hold the player still).
+
+SignalDetected still works too: the action sends `timeline_ended`, `timeline_choice` (with the number), and the text of any Signal event to the object that started the dialogue, exactly like the link node does.
+
+This works on AGMaker 1.3 and 1.4.0 — no node in the scene needed.
+
+#### Step 2: Add the BazDialogicLink Node (Legacy)
+The node below still works, and existing projects don't need to change anything — but for new NPCs, the action above is simpler.
+
 1. In your scene, add a new node → **BazDialogicLink**
 2. Configure the node properties:
    - **Game Object is Owner**: Usually keep this checked (uses the object with your visual script)
