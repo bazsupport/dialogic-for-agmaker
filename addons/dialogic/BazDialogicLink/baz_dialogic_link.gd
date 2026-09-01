@@ -70,8 +70,8 @@ func _update_obj_visibility() -> void:
 	notify_property_list_changed()
 
 # Override _get_property_list to control which properties are visible
-func _get_property_list() -> Array:
-	var properties = []
+func _get_property_list() -> Array[Dictionary]:
+	var properties: Array[Dictionary] = []
 	
 	# Always show game_object_is_owner
 	properties.append({
