@@ -11,7 +11,7 @@ This is a modified version of Dialogic 2 that includes seamless integration with
 - Works with AGMaker 1.4.0 (Godot 4.7) as of **v1.1.1**. Earlier AGMaker versions still work too.
 - If you already hand-patched `subsystem_variables.gd` by adding `return null` (the fix shared on Discord), this release is that same fix — just replace your `addons/dialogic` folder with this one.
 - Portraits landing at the left edge of the screen on AGMaker 1.4.0 turned out to be the same parse error, fixed in v1.1.1.
-- **v1.1.2** adds a Dialogic action and condition to AGMaker's Add Dialog — see *Start a dialogue from the Add Dialog* below.
+- **v1.2** adds a Dialogic action and condition to AGMaker's Add Dialog — see *Start a dialogue from the Add Dialog* below.
 
 ## What kind of AGMaker Integration?
 
@@ -45,7 +45,7 @@ First, you'll need to create your dialogue content using Dialogic's timeline edi
 - Add your dialogue, characters, and choices
 - For detailed timeline creation, see the [Official Dialogic Documentation](https://docs.dialogic.pro/)
 
-### 🎬 Start a dialogue from the Add Dialog (v1.1.2)
+### 🎬 Start a dialogue from the Add Dialog (v1.2)
 
 In your object's visual script, open the Add Dialog → **CustomAction** tab → **Dialogic** group → **BazDialogicAction**. Set **Dialogic Operation** to **Start Timeline**, then set **Dialogic Timeline** — start typing the timeline's name and pick it from the list (the names are the ones you see in the Dialogic editor). **Start At Label** is optional — leave it blank to start from the top, or type a label name to jump straight there (handy for "second time we talk" branches driven by your AGMaker variables).
 
