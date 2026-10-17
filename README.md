@@ -12,6 +12,7 @@ This is a modified version of Dialogic 2 that includes seamless integration with
 - If you already hand-patched `subsystem_variables.gd` by adding `return null` (the fix shared on Discord), this release is that same fix — just replace your `addons/dialogic` folder with this one.
 - Portraits landing at the left edge of the screen on AGMaker 1.4.0 turned out to be the same parse error, fixed in v1.1.1.
 - **v1.2** adds a Dialogic action and condition to AGMaker's Add Dialog — see *Start a dialogue from the Add Dialog* below.
+- **v1.2.1** fixes the red `Identifier "Dialogic" not declared` errors you'd see when opening a project before enabling the Dialogic plugin. They were harmless (enabling the plugin and reloading cleared them), but now they don't show up at all.
 
 ## What kind of AGMaker Integration?
 

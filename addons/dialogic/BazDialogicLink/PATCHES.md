@@ -17,3 +17,6 @@ Re-apply these when upgrading the bundled Dialogic.
    End Timeline / Pause / Resume). Carry the folder over on upgrade.
 7. `custom_conditions/BazDialogicCondition.gd` — added v1.2, AGMaker custom condition (Timeline
    Ended / Choice Picked / Dialogue Active). Carry the folder over on upgrade.
+8. `BazDialogicLink/baz_dialogic_link.gd` — v1.2.1: reaches Dialogic through
+   `get_tree().root.get_node_or_null(^"Dialogic")` + `connect`/`call` instead of the bare `Dialogic`
+   identifier, so the script still loads before the Dialogic plugin is enabled. Same pattern as the action.

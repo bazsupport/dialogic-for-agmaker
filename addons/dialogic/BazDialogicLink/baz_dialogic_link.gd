@@ -36,15 +36,28 @@ func _ready() -> void:
 		timeline_choice.connect(Callable(target_object, "receive_signal"))
 
 func _on_start_dialogue(timeline_name:String,_value) -> void:
-	Dialogic.timeline_ended.connect(_on_timeline_ended)
-	Dialogic.signal_event.connect(_on_dialogic_signal_event)
-	Dialogic.start(timeline_name)
+	var dialogic: Node = _get_dialogic()
+	if dialogic == null:
+		push_warning("[BazDialogicLink] Dialogic not found. Enable it in Project > Project Settings > Plugins, then reload the project.")
+		return
+	dialogic.connect("timeline_ended", _on_timeline_ended)
+	dialogic.connect("signal_event", _on_dialogic_signal_event)
+	dialogic.call("start", timeline_name)
 
 func _on_timeline_ended():
-	Dialogic.timeline_ended.disconnect(_on_timeline_ended)
-	Dialogic.signal_event.disconnect(_on_dialogic_signal_event)
+	var dialogic: Node = _get_dialogic()
+	if dialogic != null:
+		dialogic.disconnect("timeline_ended", _on_timeline_ended)
+		dialogic.disconnect("signal_event", _on_dialogic_signal_event)
 	await get_tree().process_frame
 	timeline_ended.emit("timeline_ended",null)
+
+# Looks the Dialogic autoload up at runtime instead of naming it directly, so this script
+# still loads when the Dialogic plugin isn't enabled yet. Returns null if it isn't there.
+func _get_dialogic() -> Node:
+	if not is_inside_tree():
+		return null
+	return get_tree().root.get_node_or_null(^"Dialogic")
 
 func _on_dialogic_signal_event(choice_number:String) -> void:
 	timeline_choice.emit("timeline_choice", int(choice_number))
