@@ -59,14 +59,22 @@ func _execute() -> void:
 	if (not character or character.custom_info.get('style', '').is_empty()) and dialogic.has_subsystem('Styles'):
 		# if previous characters had a custom style change back to base style
 		if dialogic.current_state_info.get('base_style') != dialogic.current_state_info.get('style'):
+			# the new layout reloads the stored speaker, so store the upcoming one (not the previous one) during the swap
+			var previous_speaker: Variant = dialogic.current_state_info.get('speaker', '')
+			dialogic.current_state_info['speaker'] = character.resource_path if character else ''
 			dialogic.Styles.change_style(dialogic.current_state_info.get('base_style', 'Default'))
 			await dialogic.get_tree().process_frame
+			dialogic.current_state_info['speaker'] = previous_speaker
 
 	var character_name_text := dialogic.Text.get_character_name_parsed(character)
 	if character:
 		if dialogic.has_subsystem('Styles') and character.custom_info.get('style', null):
+			# same as above, restored afterwards so change_speaker still swaps the highlight
+			var previous_speaker: Variant = dialogic.current_state_info.get('speaker', '')
+			dialogic.current_state_info['speaker'] = character.resource_path
 			dialogic.Styles.change_style(character.custom_info.style, false)
 			await dialogic.get_tree().process_frame
+			dialogic.current_state_info['speaker'] = previous_speaker
 
 
 		if portrait and dialogic.has_subsystem('Portraits') and dialogic.Portraits.is_character_joined(character):

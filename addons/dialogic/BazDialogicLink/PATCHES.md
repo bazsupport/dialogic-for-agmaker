@@ -20,3 +20,9 @@ Re-apply these when upgrading the bundled Dialogic.
 8. `BazDialogicLink/baz_dialogic_link.gd` — v1.2.1: reaches Dialogic through
    `get_tree().root.get_node_or_null(^"Dialogic")` + `connect`/`call` instead of the bare `Dialogic`
    identifier, so the script still loads before the Dialogic plugin is enabled. Same pattern as the action.
+9. `Modules/Text/event_text.gd` — v1.2.2: in `_execute`, both `change_style` calls (back to the base style,
+   and to the character's style) now store the upcoming speaker in `current_state_info['speaker']` for the
+   swap and restore the previous value after the `await`. A rebuilt layout reloads the stored speaker, which
+   left the previous speaker's portrait under the new one (upstream issue #2458). Upstream PR #2464 set the
+   speaker without restoring it, which skips `change_speaker`'s highlight swap. Alpha 17 replaced that with a
+   reorder (PR #2543). Drop this patch when upgrading to Alpha 17 or later.
