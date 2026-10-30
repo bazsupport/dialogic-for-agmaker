@@ -26,3 +26,7 @@ Re-apply these when upgrading the bundled Dialogic.
    left the previous speaker's portrait under the new one (upstream issue #2458). Upstream PR #2464 set the
    speaker without restoring it, which skips `change_speaker`'s highlight swap. Alpha 17 replaced that with a
    reorder (PR #2543). Drop this patch when upgrading to Alpha 17 or later.
+10. `plugin.gd` — v1.2.3: removed `remove_control_from_bottom_panel(editor_view)` from `_exit_tree`. The editor
+   view lives on the main screen, never the bottom panel, so on AGMaker 2.0 (Godot 4.7) that call printed
+   `Cannot remove unknown dock "EditorView" from the bottom panel` when closing AGMaker or disabling the plugin.
+   Later upstream versions (Alpha 19) already drop the line, so this patch is not needed after upgrading.

@@ -49,7 +49,6 @@ func _enter_tree() -> void:
 
 func _exit_tree() -> void:
 	if editor_view:
-		remove_control_from_bottom_panel(editor_view)
 		editor_view.queue_free()
 
 	if inspector_plugin:

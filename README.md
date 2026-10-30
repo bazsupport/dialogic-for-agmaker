@@ -14,6 +14,7 @@ This is a modified version of Dialogic 2 that includes seamless integration with
 - **v1.2** adds a Dialogic action and condition to AGMaker's Add Dialog — see *Start a dialogue from the Add Dialog* below.
 - **v1.2.1** fixes the red `Identifier "Dialogic" not declared` errors you'd see when opening a project before enabling the Dialogic plugin. They were harmless (enabling the plugin and reloading cleared them), but now they don't show up at all.
 - **v1.2.2** fixes portraits stacking on top of each other when characters have their own style (the previous speaker's portrait stayed under the new one). That was a bug in Dialogic 2.0 Alpha 16 ([dialogic#2458](https://github.com/dialogic-godot/dialogic/issues/2458)) that Dialogic fixed in Alpha 17, and this release patches it into the bundled Alpha 16.
+- **v1.2.3** fixes the red `Cannot remove unknown dock "EditorView" from the bottom panel` error when closing AGMaker 2.0 or disabling the plugin. It was harmless, but now it doesn't show up.
 
 ## What kind of AGMaker Integration?
 
