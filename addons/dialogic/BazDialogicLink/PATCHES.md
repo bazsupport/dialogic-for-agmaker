@@ -30,3 +30,11 @@ Re-apply these when upgrading the bundled Dialogic.
    view lives on the main screen, never the bottom panel, so on AGMaker 2.0 (Godot 4.7) that call printed
    `Cannot remove unknown dock "EditorView" from the bottom panel` when closing AGMaker or disabling the plugin.
    Later upstream versions (Alpha 19) already drop the line, so this patch is not needed after upgrading.
+11. `Modules/Text/event_text.gd` — v1.2.4: in `_execute`, both `change_style` calls no longer
+   `await get_tree().process_frame`. They keep the returned layout and `await layout.ready` only when it is a
+   new layout not yet in the tree, and don't wait at all when the layout was reused (`change_style` returns null)
+   or the style didn't change. A rebuilt layout is added with `call_deferred` and reloads the current state (the
+   previous line) on `ready`. The old one-frame wait let that frame draw, so the previous line showed in the new
+   style (e.g. at the new speaker's font size) before the new line replaced it. A reused layout had the same
+   frame, with the new overrides applied to the old line. Upstream still has the frame wait as of Alpha 20 /
+   main, so re-apply this (adapted to the reordered `_execute`) when upgrading.

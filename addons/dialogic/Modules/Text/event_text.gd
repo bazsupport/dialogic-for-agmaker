@@ -62,8 +62,11 @@ func _execute() -> void:
 			# the new layout reloads the stored speaker, so store the upcoming one (not the previous one) during the swap
 			var previous_speaker: Variant = dialogic.current_state_info.get('speaker', '')
 			dialogic.current_state_info['speaker'] = character.resource_path if character else ''
-			dialogic.Styles.change_style(dialogic.current_state_info.get('base_style', 'Default'))
-			await dialogic.get_tree().process_frame
+			var base_layout: Node = dialogic.Styles.change_style(dialogic.current_state_info.get('base_style', 'Default'))
+			# a rebuilt layout is added deferred: continue on its ready (same frame, before drawing) instead of a frame later,
+			# or the previous line draws for one frame in the new style. A reused layout (null) is already updated.
+			if base_layout and not base_layout.is_node_ready():
+				await base_layout.ready
 			dialogic.current_state_info['speaker'] = previous_speaker
 
 	var character_name_text := dialogic.Text.get_character_name_parsed(character)
@@ -72,8 +75,10 @@ func _execute() -> void:
 			# same as above, restored afterwards so change_speaker still swaps the highlight
 			var previous_speaker: Variant = dialogic.current_state_info.get('speaker', '')
 			dialogic.current_state_info['speaker'] = character.resource_path
-			dialogic.Styles.change_style(character.custom_info.style, false)
-			await dialogic.get_tree().process_frame
+			var character_layout: Node = dialogic.Styles.change_style(character.custom_info.style, false)
+			# same as above: no frame where the previous line shows in the new style
+			if character_layout and not character_layout.is_node_ready():
+				await character_layout.ready
 			dialogic.current_state_info['speaker'] = previous_speaker
 
 
