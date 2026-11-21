@@ -38,3 +38,11 @@ Re-apply these when upgrading the bundled Dialogic.
    style (e.g. at the new speaker's font size) before the new line replaced it. A reused layout had the same
    frame, with the new overrides applied to the old line. Upstream still has the frame wait as of Alpha 20 /
    main, so re-apply this (adapted to the reordered `_execute`) when upgrading.
+12. `Editor/TimelineEditor/timeline_editor.tscn` and `Editor/Events/Fields/field_text_multiline.tscn` —
+   v1.2.5: removed the stored `SyntaxHighlighter` sub-resource (with `syntax_highlighter.gd` attached), its
+   ext_resource line and the `syntax_highlighter = SubResource(…)` line that used it. On AGMaker 2.1.1,
+   renaming a project variable or switch with Check References On Rename on printed `Cannot set object
+   script. Parameter should be null or a reference to a valid script.` once per scene. Both text boxes
+   already get their highlighter from `CodeCompletionHelper` in `_ready` (`timeline_editor_text.gd`,
+   `field_text_multiline.gd`). Alpha 19 already dropped it from `timeline_editor.tscn` but not from
+   `field_text_multiline.tscn`, so re-check both when upgrading.
